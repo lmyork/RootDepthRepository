@@ -19,6 +19,7 @@ $RECYCLE.BIN/
 
 #RStudio folders and files
 .Rproj.user
+.Rproj
 
 # =========================
 # Operating System Files
