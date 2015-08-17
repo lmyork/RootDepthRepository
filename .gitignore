@@ -17,6 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#RStudio folders and files
+.Rproj.user
+
 # =========================
 # Operating System Files
 # =========================
@@ -41,3 +44,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+RootDepth/.Rproj.user/BC359B53/sdb/prop/29B03AB0
+RootDepth/.Rproj.user/BC359B53/sdb/s-DB471E8C/lock_file
+RootDepth/RootDepth.Rproj
