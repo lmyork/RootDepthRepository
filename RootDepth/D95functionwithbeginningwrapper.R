@@ -38,21 +38,35 @@ DX(rootIrrHar.mese$Length.cm..mean, rootIrrHar.mese$Layer, type="both")
 #OK, want to use split and apply to aggregate but aggregate() itself isn't a good option since we need to pull in... then again seems expand.grid can fill in missing data...
 
 ##rootdepth(data, c(factor1, factor2), layers, c(length, volume, mass, whatever))
+RootsField2013.mese$Layer2 <- RootsField2013.mese$Layer*15 #each area is 30 cm, this fixes to midpoint
+
+RootsField2013.mese$Layer2[which(RootsField2013.mese$Layer== 1)] <- 15
+
+RootsField2013.mese$Layer2[which(RootsField2013.mese$Layer== 2)] <- 45
+
+RootsField2013.mese$Layer2[which(RootsField2013.mese$Layer== 3)] <- 75
+?identi
+write.csv(RootsField2013.mese, "RootsField2013layer2.csv")
+
+
 
 depthfactors <- with(RootsField2013.mese, list(Water, Geno)) #c(factor1, factor2)
-depthlayerslength <- subset(RootsField2013.mese, select= c(Layer, Length.cm..mean)) #layers, c(length, volume, mass, whatever) for now single is OK
+depthlayerslength <- subset(RootsField2013.mese, select= c(Layer2, Length.cm..mean)) #layers, c(length, volume, mass, whatever) for now single is OK
 
 
-sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="both", D=.5)) 
-sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer, type="linear", D=.5)) 
+sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer2, type="both", D=.5)) 
+sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer2, type="both", D=.95)) 
+sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer2, type="linear", D=.95)) 
+
+
 
 
 #above I give the final solution, below is where I figured that out - now it just needs to be a bit more generic in the master call
 
 ##
 
-barleyD95 <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="linear", D=.95)) 
-barleyD50 <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="linear", D=.5)) 
+barleyD95 <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer2, type="linear", D=.95)) 
+barleyD50 <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, x$Layer2, type="linear", D=.5)) 
 plot(barleyD95 ~ barleyD50)
 summary(lm(as.matrix(barleyD95)[,1] ~ as.matrix(barleyD50)[,1]))
 abline(lm(as.matrix(barleyD95)[,1] ~ as.matrix(barleyD50)[,1]))
