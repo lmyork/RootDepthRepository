@@ -23,6 +23,8 @@ DX=function(lengths,depths,type="linear",n=200,D=0.95){
 ##other options needed for DX function, or its wrapper above one level
 #based on averaged or raw data in each depth
 #how will it handle missing data?
+#default to calculate both D50 and D95, those are the standards
+#is there much work on using splines to fit these? can we validate which is better somehow?
 
 #first let's apply the DX function to a test case of a single core
 
@@ -54,6 +56,19 @@ barleyD50 <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Len
 plot(barleyD95 ~ barleyD50)
 summary(lm(as.matrix(barleyD95)[,1] ~ as.matrix(barleyD50)[,1]))
 abline(lm(as.matrix(barleyD95)[,1] ~ as.matrix(barleyD50)[,1]))
+
+is.vector(barleyD95)
+
+D95barleyboth <- sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="both", D=.5)) 
+
+as.matrix(D95barleyboth)[1,]
+colnames(D95barleyboth)
+
+sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="both", D=.5)) 
+
+t(sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="both", D=.5)))
+
+cbind(as.vector(depthfactors[1]), as.vector(depthfactors[2]),sapply(split(depthlayerslength, depthfactors), function(x) DX(x$Length.cm..mean, 15*x$Layer, type="both", D=.5)))
 
 
 #this returns a list, but we would actually want to return a data frame. the list combines the factors separated by a period but we need them separated as columns
