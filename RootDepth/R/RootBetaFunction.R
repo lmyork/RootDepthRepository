@@ -12,3 +12,4 @@ RootBeta=function(lengths,depths) {
   rootbeta.fit <- nls(cumsumroot ~ 1 - beta^depths, data=rootdata, start = list(beta = .8))
   return(summary(rootbeta.fit)$parameters[1])
 } #end RootBeta function, works
+

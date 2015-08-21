@@ -15,6 +15,22 @@ factors <- list(fac1, fac2) #split by 2 factors
 
 sapply(split(xy, factors), function(c) coef(lm(c$y~c$x))[2]) #run regression by these 4 groups, pull out slope
 
+
+
+
+#                                      best solution stack overflow - use!
+
+aggregate(cbind(slope=1:nrow(xy))~fac1+fac2,FUN=function(r) coef(lm(y~x,data=xy[r,]))[2])
+
+
+
+
+# http://www.r-bloggers.com/how-to-write-and-debug-an-r-function/
+
+# look above as I look into passing argumetns and such
+
+
+
 ##basis for answer?
 
 slopes <- sapply(split(xy, factors), function(c) coef(lm(c$y~c$x))[2]) #run regression by these 4 groups, pull out slope
@@ -29,9 +45,20 @@ library("plyr")
 neatdata <- data.frame(fac1,fac2,x,y)
 ddply(neatdata, c("fac1", "fac2"), function(c) coef(lm(c$y~c$x))[2])
 
-#best solution stack overflow - use!
 
-aggregate(cbind(slope=1:nrow(xy))~fac1+fac2,FUN=function(r) coef(lm(y~x,data=xy[r,]))[2])
+#modification to help for our case
+
+aggregate(cbind(slope=row.names(xy))~fac1+fac2,FUN=function(r) coef(lm(y~x,data=xy[r,]))[2])
+
+#can i break it?
+
+aggregate(cbind(slope=row.names(xy))~fac1+fac2,FUN=function(r) coef(lm(xy$y[r]~xy$x[r]))[2])
+
+FUN=function(r) return(r)
+
+aggregate(cbind(slope=row.names(xy))~fac1+fac2,FUN=function(r) return(r))
+
+
 
 
 ##someone's answer
@@ -53,3 +80,41 @@ dt_res$names = gsub(".c[$]x","",dt_res$names)
 dt_res$fac1 = substr(dt_res$names,1,1)
 dt_res$fac2 = substr(dt_res$names,3,3)
 dt_res[,c("fac1","fac2","slope")]
+
+#####getting the names of stuff and stuff
+
+fooFunc <- function( dfNameStr, colNamestr, drop=TRUE) {
+  df <- get(dfNameStr)
+  return(df[,colNamestr, drop=drop])
+}
+
+
+> myData <- data.frame(ID=1:10, variable1=rnorm(10, 10, 1))
+> myData
+ID variable1
+1   1 10.838590
+2   2  9.596791
+3   3 10.158037
+4   4  9.816136
+5   5 10.388900
+6   6 10.873294
+7   7  9.178112
+8   8 10.828505
+9   9  9.113271
+10 10 10.345151
+
+
+> fooFunc('myData', 'ID', drop=F)
+ID
+1   1
+2   2
+3   3
+4   4
+5   5
+6   6
+7   7
+8   8
+9   9
+10 10
+> fooFunc('myData', 'ID', drop=T)
+[1]  1  2  3  4  5  6  7  8  9 10
