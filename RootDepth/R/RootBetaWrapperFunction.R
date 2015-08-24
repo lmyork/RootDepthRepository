@@ -1,6 +1,56 @@
 ###split and apply beta function
 ##load RootsField2013.mese.csv first!
 
+rootbeta.ag <- function(data, depths, roots, splitby) {
+  if (length(splitby) == 1) {
+    byfactors <- data[splitby]
+    
+  } #if we are only aggregating by 1 factor, aggregate by arg different
+  
+  if (length(splitby) > 1) {
+    byfactors <- as.list(data[, splitby])
+    
+  } #if we are only aggregating by 2 or more factors, aggregate by arg different
+  
+  rows <- as.numeric(row.names(data)) #get the row names to index by base on splitting
+  
+  betas <- aggregate(rows, by=byfactors, FUN=function(r) RootBeta(data[r, roots], data[r, depths]))
+  #betas, apply the RootBeta function based on subsetting data frame based on indexes split above
+  
+  names(betas) <- c(splitby, "beta")
+  
+  return(betas)
+  
+} #end rootbeta.ag function
+
+rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby=c("Geno", "Water"))
+
+rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby="Geno") 
+
+
+
+
+
+
+rootbeta.ag <- function(data, depths, roots, factors) {
+  
+  rows <- as.numeric(row.names(data))
+  
+  betas <- aggregate(rows, by=as.list(data[, factors]), FUN=function(r) RootBeta(data[r, roots], data[r, depths]))
+  
+  names(betas) <- c(factors, "beta")
+  
+  return(betas)
+  
+} #end rootbeta.ag function
+
+
+
+
+
+
+
+
 
 #                                       basic working wrapper in base R, needs to be made more general
 
@@ -8,11 +58,42 @@ aggregate(as.numeric(row.names(RootsField2013.mese)) ~ RootsField2013.mese$Water
 
 # http://www.r-bloggers.com/how-to-write-and-debug-an-r-function/
 
-# look above as I look into passing argumetns and such
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+RootsField2013.mese[, c("Geno", "Water")]
+
+aggregate(as.numeric(row.names(RootsField2013.mese)), by=list(RootsField2013.mese[, c("Geno", "Water")]), FUN=function(r) RootBeta(RootsField2013.mese$Length.cm..mean[r], RootsField2013.mese$Layer2[r]))##works!!!!!
+
+rows <- as.numeric(row.names(RootsField2013.mese))
+
+aggregate(rows, by=list(RootsField2013.mese$Geno, RootsField2013.mese$Water), FUN=function(r) RootBeta(RootsField2013.mese$Length.cm..mean[r], RootsField2013.mese$Layer2[r])) #
+
+
+data <- RootsField2013.mese
+factors <- c("Geno", "Water")
+roots <- "Length.cm..mean"
+depths <- "Layer2"
+rows <- as.numeric(row.names(data))
+
+
+aggregate(rows, by=as.list(RootsField2013.mese[, c("Geno", "Water")]), FUN=function(r) RootBeta(RootsField2013.mese$Length.cm..mean[r], RootsField2013.mese$Layer2[r]))##works!!!!! getting pretty generic up in here!
+
+aggregate(rows, by=as.list(data[, factors]), FUN=function(r) RootBeta(data[r, roots], data[r, depths]))##works!!!!! getting pretty generic up in here!
+
+
+aggregate(rows, by=RootsField2013.mese["Geno"], FUN=function(r) RootBeta(RootsField2013.mese$Length.cm..mean[r], RootsField2013.mese$Layer2[r]))##works!!!!! getting pretty generic up in here!
 
 
 
