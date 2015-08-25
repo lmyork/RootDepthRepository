@@ -2,6 +2,61 @@
 ##load RootsField2013.mese.csv first!
 
 rootbeta.ag <- function(data, depths, roots, splitby) {
+  
+## start, shared by both wrapping functions, make another function so only udpate once
+  
+  data2 <- data[, c(splitby, depths, roots)] #make a df of only columns of interest, avoid excess NA omits
+  data.omit <- na.omit(data2) #make version with data omitted
+  
+  if (dim(data.omit)[1] < dim(data2)[1]) {
+    nr <- dim(data2)[1] - dim(data.omit)[1]
+    row.names(data.omit) <- as.character(1:dim(data.omit)[1])
+    warning(paste(nr, "rows were omitted"))
+    
+  } #we need to omit data in case fitting functions are unhappy
+  
+  if (length(splitby) == 1) {
+    byfactors <- data.omit[splitby]
+    
+  } #if we are only aggregating by 1 factor, aggregate by arg different
+  
+  if (length(splitby) > 1) {
+    byfactors <- as.list(data.omit[, splitby])
+    
+  } #if we are only aggregating by 2 or more factors, aggregate by arg different
+  
+  rows <- as.numeric(row.names(data.omit)) #get the row names to index by base on splitting
+  
+## end, shared by both wrapping functions, make another function so only udpate once
+  
+  
+  betas <- aggregate(rows, by=byfactors, FUN=function(r) RootBeta(data.omit[r, roots], data.omit[r, depths]))
+  #betas, apply the RootBeta function based on subsetting data frame based on indexes split above
+  
+  names(betas) <- c(splitby, "beta")
+  
+  return(betas)
+  
+} #end rootbeta.ag
+
+
+rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby=c("Geno", "Water"))
+
+rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby="Geno") 
+
+
+
+
+
+
+rootbeta.ag <- function(data, depths, roots, splitby) {
+  data.omit <- na.omit(data)
+  if (dim(data.omit)[1] < dim(data)[1]) {
+    nr <- dim(data)[1] - dim(data2)[1]
+    warning(paste(nr, "rows are omitted"))
+    
+  } #if we are only aggregating by 1 factor, aggregate by arg different
+  
   if (length(splitby) == 1) {
     byfactors <- data[splitby]
     
@@ -23,9 +78,11 @@ rootbeta.ag <- function(data, depths, roots, splitby) {
   
 } #end rootbeta.ag function
 
-rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby=c("Geno", "Water"))
 
-rootbeta.ag(data=RootsField2013.mese, depths="Layer2", roots="Length.cm..mean", splitby="Geno") 
+
+###handlig NAs
+
+
 
 
 
@@ -82,7 +139,7 @@ aggregate(rows, by=list(RootsField2013.mese$Geno, RootsField2013.mese$Water), FU
 
 
 data <- RootsField2013.mese
-factors <- c("Geno", "Water")
+splitby <- c("Geno", "Water")
 roots <- "Length.cm..mean"
 depths <- "Layer2"
 rows <- as.numeric(row.names(data))
